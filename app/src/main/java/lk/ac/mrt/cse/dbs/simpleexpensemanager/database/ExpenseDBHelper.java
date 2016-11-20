@@ -26,7 +26,7 @@ public class ExpenseDBHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE IF NOT EXISTS transactions(" +
                 "transaction_no INTEGER PRIMARY KEY," +
                 "account_no VARCHAR" +
-                "expense_type INT2," +
+                "type INT2," +
                 "amount REAL," +
                 "date DATE," +
                 "FOREIGN KEY (account_no) REFERENCES Account(account_no)" +

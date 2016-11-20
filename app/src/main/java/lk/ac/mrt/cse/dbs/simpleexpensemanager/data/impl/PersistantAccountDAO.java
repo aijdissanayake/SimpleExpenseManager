@@ -46,12 +46,12 @@ public class PersistantAccountDAO implements AccountDAO {
         List<Account> accounts = new ArrayList<Account>();
 
         if(resultSet.moveToFirst()) {
-            //create account objects to add
+            //create account objects to add to the list
             do {
-                Account account = new Account(resultSet.getString(resultSet.getColumnIndex("Account_no")),
-                        resultSet.getString(resultSet.getColumnIndex("Bank")),
-                        resultSet.getString(resultSet.getColumnIndex("Holder")),
-                        resultSet.getDouble(resultSet.getColumnIndex("Initial_amt")));
+                Account account = new Account(resultSet.getString(resultSet.getColumnIndex("account_no")),
+                        resultSet.getString(resultSet.getColumnIndex("bank_name")),
+                        resultSet.getString(resultSet.getColumnIndex("holder_name")),
+                        resultSet.getDouble(resultSet.getColumnIndex("balance")));
                 accounts.add(account);
             } while (resultSet.moveToNext());
         }
@@ -66,10 +66,10 @@ public class PersistantAccountDAO implements AccountDAO {
 
         if(resultSet.moveToFirst()) {
             do {
-                account = new Account(resultSet.getString(resultSet.getColumnIndex("Account_no")),
-                        resultSet.getString(resultSet.getColumnIndex("Bank")),
-                        resultSet.getString(resultSet.getColumnIndex("Holder")),
-                        resultSet.getDouble(resultSet.getColumnIndex("Initial_amt")));
+                account = new Account(resultSet.getString(resultSet.getColumnIndex("account_no")),
+                        resultSet.getString(resultSet.getColumnIndex("bank_name")),
+                        resultSet.getString(resultSet.getColumnIndex("holder_name")),
+                        resultSet.getDouble(resultSet.getColumnIndex("balance")));
             } while (resultSet.moveToNext());
         }
 
@@ -94,8 +94,8 @@ public class PersistantAccountDAO implements AccountDAO {
 
     @Override
     public void removeAccount(String accountNo) throws InvalidAccountException {
-        String sql = "DELETE FROM account WHERE Account_no = ?";
-        SQLiteStatement statement = database.compileStatement(sql);
+        String prepStat = "DELETE FROM accounts WHERE account_no = ?";
+        SQLiteStatement statement = database.compileStatement(prepStat);
 
         statement.bindString(1,accountNo);
 
@@ -104,8 +104,9 @@ public class PersistantAccountDAO implements AccountDAO {
 
     @Override
     public void updateBalance(String accountNo, ExpenseType expenseType, double amount) throws InvalidAccountException {
-        String sql = "UPDATE Account SET Initial_amt = Initial_amt + ?";
-        SQLiteStatement statement = database.compileStatement(sql);
+        String prepStat = "UPDATE accounts SET balance = balance + ?";
+        SQLiteStatement statement = database.compileStatement(prepStat);
+        //check income or expense
         if(expenseType == ExpenseType.EXPENSE){
             statement.bindDouble(1,-amount);
         }else{
