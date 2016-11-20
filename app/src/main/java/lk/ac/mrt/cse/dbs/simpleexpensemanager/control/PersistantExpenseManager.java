@@ -19,17 +19,17 @@ public class PersistantExpenseManager extends ExpenseManager {
     @Override
     public void setup(){
         //database
-        SQLiteDatabase mydatabase = ctx.openOrCreateDatabase("140133X", ctx.MODE_PRIVATE, null);
+        SQLiteDatabase expensedatabase = ctx.openOrCreateDatabase("140133X", ctx.MODE_PRIVATE, null);
 
         //initializing database for the first time
-        mydatabase.execSQL("CREATE TABLE IF NOT EXISTS accounts(" +
+        expensedatabase.execSQL("CREATE TABLE IF NOT EXISTS accounts(" +
                 "account_no VARCHAR PRIMARY KEY," +
                 "bank_name VARCHAR," +
                 "holder_name VARCHAR," +
                 "balance REAL" +
                 " );");
 
-        mydatabase.execSQL("CREATE TABLE IF NOT EXISTS transaction_details(" +
+        expensedatabase.execSQL("CREATE TABLE IF NOT EXISTS transaction_details(" +
                 "transaction_no INTEGER PRIMARY KEY," +
                 "account_no VARCHAR," +
                 "type INT," +
@@ -39,14 +39,11 @@ public class PersistantExpenseManager extends ExpenseManager {
                 ");");
 
 
+        PersistantAccountDAO accDAO = new PersistantAccountDAO(expensedatabase);
 
-        //These two functions will hold our DAO instances in memory till the program exists
-        PersistantAccountDAO accountDAO = new PersistantAccountDAO(mydatabase);
-        //accountDAO.addAccount(new Account("Account12","Sampath bank","Manujith",500));
+        setAccountsDAO(accDAO);
 
-        setAccountsDAO(accountDAO);
-
-        setTransactionsDAO(new PersistantTransactionDAO(mydatabase));
+        setTransactionsDAO(new PersistantTransactionDAO(expensedatabase));
     }
 }
 

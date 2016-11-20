@@ -25,15 +25,15 @@ public class PersistantAccountDAO implements AccountDAO {
     @Override
     public List<String> getAccountNumbersList() {
         //using a cursor to iterate reults.
-        Cursor resultSet = database.rawQuery("SELECT account_no FROM accounts",null);
+        Cursor accSet = database.rawQuery("SELECT account_no FROM accounts",null);
         //We point the cursor to the first record before looping
 
         //Initialize the list for accountNumbers and adding accountNumbers
         List<String> accountNumbers = new ArrayList<String>();
-        if(resultSet.moveToFirst()) {
+        if(accSet.moveToFirst()) {
             do {
-                accountNumbers.add(resultSet.getString(resultSet.getColumnIndex("account_no")));
-            } while (resultSet.moveToNext());
+                accountNumbers.add(accSet.getString(accSet.getColumnIndex("account_no")));
+            } while (accSet.moveToNext());
         }
         //Return the list
         return accountNumbers;
@@ -41,19 +41,19 @@ public class PersistantAccountDAO implements AccountDAO {
 
     @Override
     public List<Account> getAccountsList() {
-        Cursor resultSet = database.rawQuery("SELECT * FROM accounts",null);
+        Cursor accSet = database.rawQuery("SELECT * FROM accounts",null);
         //Initialize the list for accounts and adding accounts
         List<Account> accounts = new ArrayList<Account>();
 
-        if(resultSet.moveToFirst()) {
+        if(accSet.moveToFirst()) {
             //create account objects to add to the list
             do {
-                Account account = new Account(resultSet.getString(resultSet.getColumnIndex("account_no")),
-                        resultSet.getString(resultSet.getColumnIndex("bank_name")),
-                        resultSet.getString(resultSet.getColumnIndex("holder_name")),
-                        resultSet.getDouble(resultSet.getColumnIndex("balance")));
+                Account account = new Account(accSet.getString(accSet.getColumnIndex("account_no")),
+                        accSet.getString(accSet.getColumnIndex("bank_name")),
+                        accSet.getString(accSet.getColumnIndex("holder_name")),
+                        accSet.getDouble(accSet.getColumnIndex("balance")));
                 accounts.add(account);
-            } while (resultSet.moveToNext());
+            } while (accSet.moveToNext());
         }
 
         return accounts;
@@ -61,16 +61,16 @@ public class PersistantAccountDAO implements AccountDAO {
 
     @Override
     public Account getAccount(String accountNo) throws InvalidAccountException {
-        Cursor resultSet = database.rawQuery("SELECT * FROM accounts WHERE account_no = " + accountNo,null);
+        Cursor accSet = database.rawQuery("SELECT * FROM accounts WHERE account_no = " + accountNo,null);
         Account account = null;
 
-        if(resultSet.moveToFirst()) {
+        if(accSet.moveToFirst()) {
             do {
-                account = new Account(resultSet.getString(resultSet.getColumnIndex("account_no")),
-                        resultSet.getString(resultSet.getColumnIndex("bank_name")),
-                        resultSet.getString(resultSet.getColumnIndex("holder_name")),
-                        resultSet.getDouble(resultSet.getColumnIndex("balance")));
-            } while (resultSet.moveToNext());
+                account = new Account(accSet.getString(accSet.getColumnIndex("account_no")),
+                        accSet.getString(accSet.getColumnIndex("bank_name")),
+                        accSet.getString(accSet.getColumnIndex("holder_name")),
+                        accSet.getDouble(accSet.getColumnIndex("balance")));
+            } while (accSet.moveToNext());
         }
 
         return account;
@@ -95,24 +95,24 @@ public class PersistantAccountDAO implements AccountDAO {
     @Override
     public void removeAccount(String accountNo) throws InvalidAccountException {
         String prepStat = "DELETE FROM accounts WHERE account_no = ?";
-        SQLiteStatement statement = database.compileStatement(prepStat);
+        SQLiteStatement sqlStatement = database.compileStatement(prepStat);
 
-        statement.bindString(1,accountNo);
+        sqlStatement.bindString(1,accountNo);
 
-        statement.executeUpdateDelete();
+        sqlStatement.executeUpdateDelete();
     }
 
     @Override
     public void updateBalance(String accountNo, ExpenseType expenseType, double amount) throws InvalidAccountException {
         String prepStat = "UPDATE accounts SET balance = balance + ?";
-        SQLiteStatement statement = database.compileStatement(prepStat);
+        SQLiteStatement sqlStatement = database.compileStatement(prepStat);
         //check income or expense
         if(expenseType == ExpenseType.EXPENSE){
-            statement.bindDouble(1,-amount);
+            sqlStatement.bindDouble(1,-amount);
         }else{
-            statement.bindDouble(1,amount);
+            sqlStatement.bindDouble(1,amount);
         }
 
-        statement.executeUpdateDelete();
+        sqlStatement.executeUpdateDelete();
     }
 }

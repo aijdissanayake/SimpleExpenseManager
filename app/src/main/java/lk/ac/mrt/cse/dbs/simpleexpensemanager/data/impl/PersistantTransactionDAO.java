@@ -24,46 +24,46 @@ public class PersistantTransactionDAO implements TransactionDAO {
     @Override
     public void logTransaction(Date date, String accountNo, ExpenseType expenseType, double amount) {
         String prepStat = "INSERT INTO transaction_details (account_no,type,amount,date) VALUES (?,?,?,?)";
-        SQLiteStatement statement = database.compileStatement(prepStat);
+        SQLiteStatement sqlStatement = database.compileStatement(prepStat);
 
-        statement.bindString(1,accountNo);
-        statement.bindLong(2,(expenseType == ExpenseType.EXPENSE) ? 0 : 1);
-        statement.bindDouble(3,amount);
-        statement.bindLong(4,date.getTime());
+        sqlStatement.bindString(1,accountNo);
+        sqlStatement.bindLong(2,(expenseType == ExpenseType.EXPENSE) ? 0 : 1);
+        sqlStatement.bindDouble(3,amount);
+        sqlStatement.bindLong(4,date.getTime());
 
-        statement.executeInsert();
+        sqlStatement.executeInsert();
     }
 
     @Override
     public List<Transaction> getAllTransactionLogs() {
-        Cursor resultSet = database.rawQuery("SELECT * FROM transaction_details",null);
+        Cursor transSet = database.rawQuery("SELECT * FROM transaction_details",null);
         List<Transaction> transactions = new ArrayList<Transaction>();
 
-        if(resultSet.moveToFirst()) {
+        if(transSet.moveToFirst()) {
             do{
-                Transaction t = new Transaction(new Date(resultSet.getLong(resultSet.getColumnIndex("date"))),
-                        resultSet.getString(resultSet.getColumnIndex("account_no")),
-                        (resultSet.getInt(resultSet.getColumnIndex("type")) == 0) ? ExpenseType.EXPENSE : ExpenseType.INCOME,
-                        resultSet.getDouble(resultSet.getColumnIndex("amount")));
+                Transaction t = new Transaction(new Date(transSet.getLong(transSet.getColumnIndex("date"))),
+                        transSet.getString(transSet.getColumnIndex("account_no")),
+                        (transSet.getInt(transSet.getColumnIndex("type")) == 0) ? ExpenseType.EXPENSE : ExpenseType.INCOME,
+                        transSet.getDouble(transSet.getColumnIndex("amount")));
                 transactions.add(t);
-            }while (resultSet.moveToNext());
+            }while (transSet.moveToNext());
         }
         return transactions;
     }
 
     @Override
     public List<Transaction> getPaginatedTransactionLogs(int limit) {
-        Cursor resultSet = database.rawQuery("SELECT * FROM transaction_details LIMIT " + limit,null);
+        Cursor transSet = database.rawQuery("SELECT * FROM transaction_details LIMIT " + limit,null);
         List<Transaction> transactions = new ArrayList<Transaction>();
 
-        if(resultSet.moveToFirst()) {
+        if(transSet.moveToFirst()) {
             do {
-                Transaction t = new Transaction(new Date(resultSet.getLong(resultSet.getColumnIndex("date"))),
-                        resultSet.getString(resultSet.getColumnIndex("account_no")),
-                        (resultSet.getInt(resultSet.getColumnIndex("type")) == 0) ? ExpenseType.EXPENSE : ExpenseType.INCOME,
-                        resultSet.getDouble(resultSet.getColumnIndex("amount")));
+                Transaction t = new Transaction(new Date(transSet.getLong(transSet.getColumnIndex("date"))),
+                        transSet.getString(transSet.getColumnIndex("account_no")),
+                        (transSet.getInt(transSet.getColumnIndex("type")) == 0) ? ExpenseType.EXPENSE : ExpenseType.INCOME,
+                        transSet.getDouble(transSet.getColumnIndex("amount")));
                 transactions.add(t);
-            } while (resultSet.moveToNext());
+            } while (transSet.moveToNext());
         }
 
         return transactions;
